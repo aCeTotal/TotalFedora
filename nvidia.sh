@@ -32,6 +32,7 @@ mkdir -p /usr/share/sddm/themes
 cp -R dotconfig/* /home/$username/.config/
 tar -xzvf sugar-candy.tar.gz -C /usr/share/sddm/themes
 mv /home/$username/.config/sddm.conf /etc/sddm.conf
+mv /home/$username/.config/.xinitrc /home/$username/
 
 # Installing Essential Programs 
 sudo dnf install xdg-user-dirs bspwm sxhkd kitty rofi polybar picom thunar nitrogen unzip yad wget pavucontrol -y
@@ -39,6 +40,10 @@ sudo dnf install xdg-user-dirs bspwm sxhkd kitty rofi polybar picom thunar nitro
 sudo dnf install neofetch arandr git vim flameshot mangohud lxappearance papirus-icon-theme -y
 # Installing popular softwares
 sudo dnf install blender gimp freecad libreoffice steam discord 
+
+# Cursor
+sudo dnf copr enable peterwu/rendezvous
+sudo dnf install bibata-cursor-themes
 
 # Install and enable SDDM
 sudo dnf install sddm

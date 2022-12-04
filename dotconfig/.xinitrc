@@ -1,4 +1,4 @@
-Xcursor.theme: Breeze_Hacked &
+Xcursor.theme: Bibata-Modern-Ice &
 xsetroot -cursor_name left_ptr &
 
 nitrogen --restore &
