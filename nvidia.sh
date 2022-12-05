@@ -6,8 +6,21 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-username=$(whoami)
+username=$(id -u -n 1000)
 builddir=$(pwd)
+
+# Enable parallell download and choose the fastest mirrors
+
+cat > /etc/dnf/dnf.conf << EOF
+[main]
+gpgcheck=True
+installonly_limit=10
+clean_requirements_on_remove=True
+best=False
+skip_if_unavailable=True
+max_parallel_downloads=10
+fastestmirror=True
+EOF
 
 # Update packages list and update system + adding rpmfusion repo
 sudo dnf update -y
@@ -15,10 +28,10 @@ sudo dnf upgrade --refresh -y
 sudo dnf install dnf-plugins-core -y
 
 sudo dnf install \
-https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm -y
 
 sudo dnf install \
-https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
 
 sudo dnf update --refresh -y
 
@@ -39,14 +52,14 @@ sudo dnf install xdg-user-dirs bspwm sxhkd kitty rofi polybar picom thunar nitro
 # Installing Other less important Programs
 sudo dnf install neofetch arandr git vim flameshot mangohud lxappearance papirus-icon-theme -y
 # Installing popular softwares
-sudo dnf install blender gimp freecad libreoffice steam discord 
+sudo dnf install blender gimp freecad libreoffice steam discord -y
 
 # Cursor
-sudo dnf copr enable peterwu/rendezvous
-sudo dnf install bibata-cursor-themes
+sudo dnf copr enable peterwu/rendezvous -y
+sudo dnf install bibata-cursor-themes -y
 
 # Install and enable SDDM
-sudo dnf install sddm
+sudo dnf install sddm -y
 sudo systemctl enable sddm
 sudo systemctl set-default graphical.target
 
@@ -57,9 +70,9 @@ sudo dnf install xorg-x11-drv-nvidia-cuda -y
 sudo dnf install xorg-x11-drv-nvidia-cuda-libs -y
 
 # Install brave
-sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/x86_64/
-sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-sudo dnf install brave-browser
+sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/x86_64/ -y
+sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc -y
+sudo dnf install brave-browser -y
 
 # Download Nordic Theme
 cd /usr/share/themes/
