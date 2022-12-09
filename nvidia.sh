@@ -47,7 +47,6 @@ mkdir -p /home/$username/Bilder/Screenshots/
 mkdir -p /usr/share/sddm/themes
 cp -R dotconfig/* /home/$username/.config/
 tar -xzvf sugar-candy.tar.gz -C /usr/share/sddm/themes
-mv /home/$username/.config/sddm.conf /etc/sddm.conf
 
 # Installing Essential Programs 
 sudo dnf install xdg-user-dirs bspwm sxhkd kitty rofi polybar picom thunar nitrogen zip unzip mpv yad wget pavucontrol blueman network-manager-applet -y
