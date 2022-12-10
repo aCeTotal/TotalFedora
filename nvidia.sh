@@ -8,18 +8,21 @@ fi
 
 username=$(id -u -n 1000)
 builddir=$(pwd)
+hostname=Fedora_Office
 
 # Enable parallell download and choose the fastest mirrors
 
 cat > /etc/dnf/dnf.conf << EOF
 [main]
+color=always
 gpgcheck=True
-installonly_limit=10
+installonly_limit=3
 clean_requirements_on_remove=True
 best=False
 skip_if_unavailable=True
-max_parallel_downloads=10
+max_parallel_downloads=20
 fastestmirror=True
+deltarpm=true
 EOF
 
 # Update packages list and update system + adding rpmfusion repo
@@ -36,6 +39,11 @@ https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -
 
 sudo dnf update --refresh -y
 
+# Media codecs
+sudo dnf install gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel -y
+sudo dnf install lame\* --exclude=lame-devel -y
+sudo dnf group upgrade --with-optional Multimedia -y
+
 # Making .config and Moving config files and background to Pictures
 cd $builddir
 mkdir -p /home/$username/.config
@@ -44,16 +52,20 @@ mkdir -p /home/$username/Dokumenter/
 mkdir -p /home/$username/Downloads/
 mkdir -p /home/$username/Bilder/
 mkdir -p /home/$username/Bilder/Screenshots/
+mkdir -p /home/$username/Bilder/Wallpapers/
 mkdir -p /usr/share/sddm/themes
 cp -R dotconfig/* /home/$username/.config/
 tar -xzvf sugar-candy.tar.gz -C /usr/share/sddm/themes
 
+#Set hostname
+sudo hostnamectl set-hostname "$hostname"
+
 # Installing Essential Programs 
-sudo dnf install xdg-user-dirs bspwm sxhkd kitty rofi polybar picom thunar nitrogen zip unzip mpv yad wget pavucontrol blueman network-manager-applet -y
+sudo dnf install xdg-user-dirs gimp freecad bspwm sxhkd xev kitty rofi polybar picom thunar nitrogen zip unzip mpv yad wget pavucontrol blueman network-manager-applet -y
 # Installing Other less important Programs
-sudo dnf install neofetch arandr git vim flameshot mangohud lxappearance papirus-icon-theme -y
-# Installing popular softwares
-sudo dnf install gimp freecad steam discord protonup gamemode lutris -y
+sudo dnf install neofetch prusa-slicer arandr git vim flameshot lxappearance papirus-icon-theme -y
+# Installing Gaming-related stuff
+sudo dnf install steam discord protonup gamemode lutris mangohud -y
 
 # Install Joplin Notebook
 sudo dnf install -y dnf-plugins-core distribution-gpg-keys -y
@@ -76,8 +88,8 @@ sudo dnf copr enable peterwu/rendezvous -y
 sudo dnf install bibata-cursor-themes -y
 
 # Install and enable SDDM
-sudo dnf install sddm -y
-sudo systemctl enable sddm
+sudo dnf install lightdm -y
+sudo systemctl enable lightdm
 sudo systemctl set-default graphical.target
 
 # Nvidia drivers
@@ -90,6 +102,11 @@ sudo dnf install xorg-x11-drv-nvidia-cuda-libs -y
 sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/x86_64/ -y
 sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc -y
 sudo dnf install brave-browser -y
+
+# Preload deamon
+sudo dnf copr enable kylegospo/preload -y
+sudo dnf install preload -y
+sudo systemctl enable --now preload
 
 # Install blender
 mkdir ~/blender-git
@@ -112,6 +129,11 @@ wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.z
 unzip FiraCode.zip -d /home/$username/.fonts
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/Meslo.zip
 unzip Meslo.zip -d /home/$username/.fonts
+
+# Security
+sudo dnf install fail2ban -y
+sudo systemctl enable fail2ban && sudo systemctl start fail2ban
+#Edit /etc/fail2ban/jail.local
 
 # Enable services
 
